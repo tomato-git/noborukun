@@ -3,42 +3,7 @@ function nowTimeButton() {
   const today = new Date();  //年月日+時分秒+曜日の取得
   const date = today.getDate();  //日付の取得
   const hours = today.getHours();  //時間の取得
-
-  switch (date) {  
-    case 1:var now = 2;break;
-    case 2:var now = 3;break;
-    case 3:var now = 4;break;
-    case 4:var now = 5;break;
-    case 5:var now = 6;break;
-    case 6:var now = 7;break;
-    case 7:var now = 8;break;
-    case 8:var now = 9;break;
-    case 9:var now = 10;break;
-    case 10:var now = 11;break;
-    case 11:var now = 12;break;
-    case 12:var now = 13;break;
-    case 13:var now = 14;break;
-    case 14:var now = 15;break;
-    case 15:var now = 16;break;
-    case 16:var now = 17;break;
-    case 17:var now = 18;break;
-    case 18:var now = 19;break;
-    case 19:var now = 20;break;
-    case 20:var now = 21;break;
-    case 21:var now = 22;break;
-    case 22:var now = 23;break;
-    case 23:var now = 24;break;
-    case 24:var now = 25;break;
-    case 25:var now = 26;break;
-    case 26:var now = 27;break;
-    case 27:var now = 28;break;
-    case 28:var now = 29;break;
-    case 29:var now = 30;break;
-    case 30:var now = 31;break;
-    case 31:var now = 32;break;  //日付の行を取得
-  }
-console.log(now)
-
+  var now = date+1 //今の日付の行を取得
 
   switch (hours) {
     case 0:case 1:case 2:case 3:case 4:case 5:case 6:case 7:case 8:case 9:case 10:case 11:  //午前の場合
