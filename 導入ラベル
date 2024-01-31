@@ -1,0 +1,213 @@
+function labelCreation() {
+
+/**フォルダとファイルの取得 */
+
+  const csvFolder  = DriveApp.getFolderById("1yYGrgHbJZVMmDA8y50SAzeWJ8VyrMwvn");  //csvを格納したフォルダ
+  const csvFiles   = csvFolder.getFiles();
+  const csvFile    = csvFiles.next();
+
+  const moveDir = DriveApp.getFolderById("1VzthXPuEDrsedQzhDh62XTki_G0GYOsK");  //導入データ(使用済み)フォルダ
+
+  const newssFile = DriveApp.getFilesByName("EXAS");  //実験動物申請書ファイル
+  const parentFile = newssFile.next();  //実験動物申請書ファイルの取得(file)
+
+  const ssFolder = DriveApp.getFolderById("18u1-neEkUtgeQsc9JCikhiO2Lpgx-vQ8");  //導入ラベルフォルダ
+  const originalfile = DriveApp.getFileById("1E2QRkjIdnwMM9Jy5J4L5l9LpLcSF9CQsUt0OFZokhnA");  //ラベル原本のファイル
+
+  const switchFile = DriveApp.getFileById("1BfMIxov6BfhEHpsmbbmKUp6KXbPqZbyMVeL7Xu14luE");  //導入ラベル(起動)ファイル
+  const switchSs = SpreadsheetApp.open(switchFile);  //導入ラベル(起動)ファイル
+  const switchSheet = switchSs.getSheetByName("起動")  //導入ラベル(起動)ファイルのシート
+
+  /**driveの処理 */
+
+  const newparentFile = SpreadsheetApp.open(parentFile);  //実験動物申請書のファイルを開く(ss)
+  const getsheet = newparentFile.getSheetByName("EXAS");  //スプレッドシートのシートを名前で取得
+  const lastRow = getsheet.getLastRow();  //取得したシートの最終行を取得
+
+  /**リスト */
+
+  const animalList = ["G2","G3","G4","G5","GL"];  //検索をかけたい階の頭文字の配列
+  const nameList = ["2階","3階","4階","5階","L階"];  //検索をかけたい階の名前の配列
+  const sexLIst = ["","♂","♀","other","妊娠","哺乳","偽妊娠"];  //検索をかけたい性の名前を配列
+
+  /**ラベル作成処理 */
+
+  switchSheet.getRange(3,3,100,7).clearContent();
+  for(let i = 0; i <= 4; i++) { //5回同じ動作を繰り返してほしいので"<= 4" に設定
+
+    var count = 3-i
+    const sonFile = originalfile.makeCopy(("導入ラベル"+"（"+"作成中"+"）"+nameList[i]),ssFolder);  //導入ラベル原本のコピー作成
+    const sonFileSheet = SpreadsheetApp.open(sonFile);  //導入ラベルのコピーを開く(ss)
+    const sheet = sonFileSheet.getActiveSheet();  //コピー元のシートを取得
+    const desiredDate = getsheet.getRange(2,9).getValue();  //導入希望日
+    var introductionDate = new Date(desiredDate)
+    for(let j = 2; j <= lastRow; j++){
+      if(getsheet.getRange(j,17).getValue()){
+        const room = getsheet.getRange(j,17).getValue();  //実験飼育室
+        if(room.match(animalList[i])){          
+          const affiliation = getsheet.getRange(j,10).getValue(); //実験責任者所属
+          let applicant = getsheet.getRange(j,11).getValue(); //申請者名
+          const lineage = getsheet.getRange(j,12).getValue(); //系統名
+          const animals = getsheet.getRange(j,13).getValue(); //導入匹数
+          const cagesUsed = getsheet.getRange(j,14).getValue(); //使用ケージ数
+          const sex = getsheet.getRange(j,15).getValue(); //性
+          const farm = getsheet.getRange(j,16).getValue();  //入手先名
+          const remarks = getsheet.getRange(j,18).getValue(); //備考
+          const age = getsheet.getRange(j,20).getValue(); //齢
+          const ageUnit = getsheet.getRange(j,21).getValue(); //単位（週齢など）
+          const tel = getsheet.getRange(j,22).getValue(); //TEL
+          const animalNumber = getsheet.getRange(j,1).getValue(); //動物番号
+
+          var copySheet = sheet.copyTo(sonFileSheet); //導入ラベルのシートをコピーする
+    
+          copySheet.getRange("H4").setValue(room);
+          
+          copySheet.getRange("A4").setValue(desiredDate);
+
+          const cutoutAffiliation = affiliation.substr(7);
+          copySheet.getRange("B2").setValue(cutoutAffiliation);
+          const affiliationNomber = cutoutAffiliation.length;
+          if (affiliationNomber >=22){
+          var fontSize = 5;
+          }else if (affiliationNomber >=19){
+            fontSize = 6;
+          }else if (affiliationNomber >=17){
+            fontSize = 7;
+          }else if (affiliationNomber >=15){
+            fontSize = 8;
+          }else if (affiliationNomber >=13){
+            fontSize = 9;
+          }else if (affiliationNomber >=9 & affiliationNomber <=12){
+            fontSize = (22 - affiliationNomber);
+          }else{
+            fontSize = 14;
+          }
+          var fontWeight = "normal";
+          if (fontSize <=8){
+            fontWeight = "bold";
+          }
+          copySheet.getRange("B2").setFontSize(fontSize).setFontWeight(fontWeight);
+
+          copySheet.getRange("B6").setValue(lineage);
+          const lineageNumber = lineage.length;
+          if(lineage.match("ノック")){
+            var fontSize0 = 9;
+          }else if(lineageNumber >=61){
+            fontSize0 = 4;
+          }else if(lineageNumber >=37){
+            fontSize0 = 5;
+          }else if(lineageNumber >=31){
+            fontSize0 = 6;
+          }else if(lineageNumber >=27){
+            fontSize0 = 7;
+          }else if(lineageNumber >=20){
+            fontSize0 = 9;
+          }else if(lineageNumber >=18){
+            fontSize0 = 11;
+          }else if(lineageNumber <=17){
+            fontSize0 = 14;
+          }
+            var fontWeight0 = "normal";
+          if (fontSize0 <=7){
+            fontWeight0 = "bold";
+          }
+          copySheet.getRange("B6").setFontSize(fontSize0).setFontWeight(fontWeight0);
+
+
+          if(applicant.match("P戸　郁美")){
+            applicant = "瀬戸 郁美"
+          }
+          copySheet.getRange("E2").setValue(applicant);
+          const nameNumber = applicant.length;
+          if(applicant.match("ｻﾑﾌﾟﾝﾀ ﾄｻﾎﾟｰﾙ")){
+            copySheet.getRange("E2").setFontSize(6);
+          }else if(nameNumber >=10){
+            copySheet.getRange("E2").setFontSize(9);
+          }
+
+          const roundingOff= Math.ceil(animals/cagesUsed);  //四捨五入を行う
+          copySheet.getRange("I6").setValue(roundingOff+"匹");
+
+          copySheet.getRange("G6").setValue(sexLIst[sex]);
+          copySheet.getRange("A8").setValue(remarks);
+          copySheet.getRange("A8").setWrap(true);
+
+          copySheet.getRange("C4").setValue(age);
+          if(Object.prototype.toString.call(age) == "[object Date]"){
+            copySheet.getRange("C4").setNumberFormat("mm/dd");
+          } 
+
+          const target0 = [
+          ["週齢", "Weekly age"],["w", "Weekly age"],["日齢", "Day age"],["日目", "Day age"],["生","Birth day"]
+          ];
+          let text = ageUnit;
+          target0.forEach(x => {
+            text = text.replace(x[0], x[1]);});          
+          copySheet.getRange("C3").setValue(text);
+
+          copySheet.getRange("H2").setValue(tel+"");
+          const cutout = animalNumber.substr(0,7);
+          copySheet.getRange("E6").setValue(cutout);
+
+          const sheetName = cutout+" "+"("+cagesUsed+")"; //導入ラベルの名前
+          copySheet.setName(sheetName);
+
+          var range = switchSheet.getRange(i+count,i+3)
+          range.setValue(room+" "+j)
+          count = count+1
+
+          console.log(room,j);
+
+          if(farm.match("医学部附属動物実験施設")){           
+            var image = DriveApp.getFileById('1XVWG_Q_dYtzVSeWETLBpBWjea05cd4Jq').getBlob();
+            copySheet.insertImage(image, 3, 2);
+          }
+          if(remarks.match("再登録")){
+            sonFileSheet.deleteSheet(copySheet);
+          }
+        }
+      }
+    }
+    console.log("次の階の作成");
+    switchSheet.getRange(i+count,i+3).setValue("作成完了");
+
+    var labelName = (Utilities.formatDate(introductionDate, "JST", "M月d日"));
+    sonFile.setName("導入ラベル"+"（"+labelName+"）"+nameList[i])
+    var setName = (Utilities.formatDate(introductionDate, "JST", "MM月"));
+
+    const sf = sonFileSheet.getSheets();
+    if (sf.length <= 1) {
+      DriveApp.getFileById(sonFileSheet.getId()).setTrashed(true);
+    }
+  }
+  const ssName = labelName+" "+"導入ラベル";  //導入ラベル原本の新しい名前の取得
+  parentFile.setName(ssName); //csvからssになったファイルの名前変更
+  switchSheet.getRange(1,3).setValue(labelName);
+  
+  /**フォルダの操作 */
+    
+  const folder = ssFolder.getFolders();
+  let folderExists = false;
+  while(folder.hasNext()) {
+    var nextFolder = folder.next();
+    const folderName = nextFolder.getName();
+    if(folderName.match(setName)){
+      folderExists = true;
+      break;
+    }  
+  }
+  if(!folderExists){
+    nextFolder = ssFolder.createFolder(setName);
+  }
+  
+  /**フォルダの操作 */
+
+  const labelFolder = nextFolder.createFolder(labelName);
+  const labelFiles = ssFolder.getFiles();
+  while(labelFiles.hasNext()) {
+    const movelabelFiles = labelFiles.next();
+    movelabelFiles.moveTo(labelFolder);
+  }
+  parentFile.moveTo(moveDir); //ssに変換したファイルの移動
+  csvFile.setTrashed(true); //csvをゴミ箱に移動
+}
